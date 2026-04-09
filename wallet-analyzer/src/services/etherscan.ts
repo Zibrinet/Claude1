@@ -1,7 +1,12 @@
 import { ethers } from 'ethers'
 
 const BASE_URL = 'https://api.etherscan.io/api'
-const CLOUDFLARE_RPC = 'https://cloudflare-eth.com'
+const PUBLIC_RPCS = [
+  'https://eth.llamarpc.com',
+  'https://rpc.ankr.com/eth',
+  'https://ethereum.publicnode.com',
+  'https://1rpc.io/eth',
+]
 
 export interface Transaction {
   hash: string
@@ -46,10 +51,18 @@ export async function resolveAddress(input: string): Promise<string> {
     return trimmed
   }
   if (trimmed.endsWith('.eth') || trimmed.includes('.')) {
-    const provider = new ethers.JsonRpcProvider(CLOUDFLARE_RPC)
-    const resolved = await provider.resolveName(trimmed)
-    if (!resolved) throw new Error(`ENS name "${trimmed}" could not be resolved`)
-    return resolved
+    let lastError: unknown
+    for (const rpc of PUBLIC_RPCS) {
+      try {
+        const provider = new ethers.JsonRpcProvider(rpc)
+        const resolved = await provider.resolveName(trimmed)
+        if (resolved) return resolved
+      } catch (err) {
+        lastError = err
+      }
+    }
+    const msg = lastError instanceof Error ? lastError.message : 'Unknown error'
+    throw new Error(`ENS name "${trimmed}" could not be resolved (${msg})`)
   }
   throw new Error('Input must be an 0x address or ENS name (e.g. vitalik.eth)')
 }
