@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice Chat with Claude</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: #aaa;
+      letter-spacing: 0.05em;
+    }
+
+    #speak-btn {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: none;
+      font-size: 2.5rem;
+      cursor: pointer;
+      background: #1db954;
+      color: white;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.4);
+    }
+
+    #speak-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+    }
+
+    #speak-btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    #speak-btn.recording {
+      background: #e02020;
+      animation: pulse 1.2s infinite;
+    }
+
+    #speak-btn:disabled {
+      background: #444;
+      cursor: not-allowed;
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(224, 32, 32, 0.5); }
+      70%  { box-shadow: 0 0 0 18px rgba(224, 32, 32, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(224, 32, 32, 0); }
+    }
+
+    #status {
+      font-size: 0.9rem;
+      color: #888;
+      min-height: 1.2em;
+    }
+
+    .message-box {
+      width: 100%;
+      max-width: 560px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .message-box label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #666;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .message-box p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #ccc;
+      min-height: 1.6em;
+    }
+
+    #reply-box p {
+      color: #7ec8e3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Voice Chat with Claude</h1>
+
+  <button id="speak-btn" title="Click to speak">🎤</button>
+
+  <div id="status">Press the button and start talking</div>
+
+  <div class="message-box" id="you-box">
+    <label>You said</label>
+    <p id="transcript"></p>
+  </div>
+
+  <div class="message-box" id="reply-box">
+    <label>Claude replied</label>
+    <p id="reply"></p>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
