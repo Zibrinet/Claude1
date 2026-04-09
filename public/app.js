@@ -12,14 +12,16 @@ if (!SpeechRecognition) {
 
 const recognition = new SpeechRecognition();
 recognition.lang = 'en-US';
-recognition.interimResults = false;
-recognition.maxAlternatives = 1;
+recognition.continuous = true;     // keep listening until stop() is called
+recognition.interimResults = true; // show words on screen as you speak
 
 let isRecording = false;
+let fullTranscript = '';
 
 // --- Button click: toggle recording ---
 btn.addEventListener('click', () => {
   if (!isRecording) {
+    fullTranscript = '';
     transcriptEl.textContent = '';
     replyEl.textContent = '';
     recognition.start();
@@ -34,22 +36,37 @@ recognition.addEventListener('start', () => {
   btn.textContent = '⏹';
   btn.classList.add('recording');
   btn.title = 'Click to stop';
-  statusEl.textContent = 'Listening…';
+  statusEl.textContent = 'Listening… speak as long as you like, then click to stop';
 });
 
-// --- Got a result ---
+// --- Words coming in (live) ---
 recognition.addEventListener('result', (event) => {
-  const transcript = event.results[0][0].transcript;
-  transcriptEl.textContent = transcript;
-  sendToClaude(transcript);
+  let interim = '';
+  for (let i = event.resultIndex; i < event.results.length; i++) {
+    const text = event.results[i][0].transcript;
+    if (event.results[i].isFinal) {
+      fullTranscript += text + ' ';
+    } else {
+      interim = text;
+    }
+  }
+  transcriptEl.textContent = fullTranscript + interim;
 });
 
-// --- Recording ended (user stopped or browser auto-stopped) ---
+// --- Recording ended (after stop() is called) ---
 recognition.addEventListener('end', () => {
   isRecording = false;
   btn.classList.remove('recording');
   btn.textContent = '🎤';
   btn.title = 'Click to speak';
+
+  const trimmed = fullTranscript.trim();
+  if (trimmed) {
+    transcriptEl.textContent = trimmed;
+    sendToClaude(trimmed);
+  } else {
+    statusEl.textContent = 'Press the button and start talking';
+  }
 });
 
 // --- Mic or speech errors ---
