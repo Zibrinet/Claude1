@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 
-const BASE_URL = 'https://api.etherscan.io/api'
+const BASE_URL = 'https://api.etherscan.io/v2/api'
 const PUBLIC_RPCS = [
   'https://eth.llamarpc.com',
   'https://rpc.ankr.com/eth',
@@ -29,6 +29,7 @@ export interface TokenBalance {
 
 async function etherscanFetch(params: Record<string, string>): Promise<unknown> {
   const url = new URL(BASE_URL)
+  url.searchParams.set('chainid', '1')
   for (const [k, v] of Object.entries(params)) {
     url.searchParams.set(k, v)
   }
